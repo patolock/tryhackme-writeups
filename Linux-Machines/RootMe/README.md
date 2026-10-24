@@ -2,6 +2,7 @@
 
 **RootMe** es una máquina de nivel fácil diseñada para practicar habilidades esenciales de pruebas de penetración (pentesting). El desafío simula un escenario real donde un servidor web mal configurado permite el compromiso total del sistema operativo subyacente.
 
+- Sala: [RootMe](https://tryhackme.com/room/rrootme)
 ---
 
 ## 🎯 Objetivos de la Auditoría

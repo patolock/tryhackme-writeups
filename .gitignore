@@ -218,3 +218,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Notas personales con información sensible
+notas-privadas.md
+*.key
+*.pem
+
+# Capturas sin editar (si guardas una carpeta aparte de borradores)
+**/evidencias/borradores/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
