@@ -69,6 +69,6 @@ El escaneo revela que **`/usr/bin/python`** posee el bit SUID activo. Utilizando
 ---
 
 ## ✒️ Autoría y Certificación
-*   **Auditor de Seguridad:** Patricio Allendes/ PatoLock
+*   **Auditor de Seguridad:** Patricio Allendes / PatoLock
 *   **Contacto / Portafolio:** https://github.com/patolock
 *   **Rol:** Estudiante de Ciberseguridad / Pentester Trainee
