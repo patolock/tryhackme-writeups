@@ -65,3 +65,10 @@ El escaneo revela que **`/usr/bin/python`** posee el bit SUID activo. Utilizando
 ## 📝 Conclusiones y Remediación
 1.  **Filtros de Subida Débiles:** Las restricciones basadas únicamente en extensiones de archivos (listas negras) son ineficaces si no bloquean todas las variantes de ejecución de scripts web (como `.php5`, `.phtml`, `.phar`). Se debe implementar una lista blanca estricta y renombrar los archivos subidos de forma aleatoria.
 2.  **Permisos SUID Peligrosos:** Asignar atributos SUID a intérpretes interactivos de comandos enteros (`python`, `perl`, `bash`, `awk`) introduce un riesgo crítico inmediato que invalida la separación de privilegios del sistema operativo.
+
+---
+
+## ✒️ Autoría y Certificación
+*   **Auditor de Seguridad:** Patricio Allendes/ PatoLock
+*   **Contacto / Portafolio:** https://github.com/patolock
+*   **Rol:** Estudiante de Ciberseguridad / Pentester Trainee
