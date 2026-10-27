@@ -1,75 +1,74 @@
-# 💀 TryHackMe: RootMe
+# TryHackMe: RootMe
 
-**RootMe** es una máquina de nivel fácil diseñada para practicar habilidades esenciales de pruebas de penetración (pentesting). El desafío simula un escenario real donde un servidor web mal configurado permite el compromiso total del sistema operativo subyacente.
+Write-up de la sala [RootMe](https://tryhackme.com/room/rrootme), una máquina Linux de nivel fácil. El recorrido cubre reconocimiento, enumeración web, acceso inicial mediante una carga de archivo y escalada de privilegios.
 
-- Sala: [RootMe](https://tryhackme.com/room/rrootme)
----
+> **Alcance:** procedimiento realizado en la máquina asignada por TryHackMe. La IP cambia entre sesiones; reemplaza `<IP_DE_LA_MAQUINA>` por la dirección que muestra tu sala.
 
-## 🎯 Objetivos de la Auditoría
-*   [ ] **Reconocimiento:** Descubrir puertos abiertos y servicios expuestos.
-*   [ ] **Enumeración Web:** Localizar directorios ocultos en el servidor HTTP.
-*   [ ] **Acceso Inicial:** Evadir filtros de subida de archivos para ejecutar una *Reverse Shell*.
-*   [ ] **Escalada de Privilegios:** Explotar un binario con permisos SUID inusuales para convertirse en `root`.
+> Para el análisis técnico de los hallazgos, puntuación CVSS y medidas de mitigación, consulta [Análisis de vulnerabilidades y recomendaciones](analisis-vulnerabilidades.md).
 
----
+## Resumen
 
-## 🛠️ Stack Tecnológico Utilizado
-*   **Escaneo:** `nmap`
-*   **Fuzzing Web:** `gobuster` / Wordlist: `common.txt`
-*   **Explotación:** *PHP Reverse Shell* (Modificada a `.phtml`)
-*   **Intercepción:** `netcat` (`nc`)
-*   **Post-Explotación:** Referencias de `GTFOBins` (Python SUID)
+| Fase | Hallazgo |
+|---|---|
+| Reconocimiento | Puertos 22/SSH y 80/HTTP |
+| Enumeración web | Rutas `/panel/` y `/uploads/` |
+| Acceso inicial | Shell remota con el usuario `www-data` |
+| Escalada | `/usr/bin/python2.7` aparece en la búsqueda de archivos SUID; se verifica acceso como `root` |
 
----
+## Procedimiento
 
-## 🚀 Metodología Paso a Paso
+### 1. Reconocimiento de servicios
 
-### 1. Reconocimiento (Recon)
-Se inicia con un escaneo agresivo de puertos para detectar qué ventanas de entrada tiene el servidor:
+Se escanearon los puertos de la máquina y se identificaron SSH en el puerto 22 y HTTP en el 80. La evidencia de la sesión muestra OpenSSH 8.2p1 y Apache 2.4.41 sobre Ubuntu.
+
 ```bash
-sudo nmap -sC -sV -oN nmap_scan.txt <IP_DE_LA_MAQUINA>
-```
-*   **Resultados:** Se identifican el puerto `22` (SSH) y el puerto `80` (HTTP corriendo Apache 2.4.29).
-
-### 2. Enumeración de Directorios Web
-Al investigar el puerto 80, no se observan enlaces directos interesantes en la página de inicio. Se ejecuta un ataque de fuerza bruta a las rutas URL utilizando un diccionario de palabras común:
-```bash
-gobuster dir -u http://<IP_DE_LA_MAQUINA>/ -w /usr/share/wordlists/dirb/common.txt
-```
-*   **Rutas críticas expuestas:**
-    *   `/panel/`: Un portal web diseñado para cargar archivos.
-    *   `/uploads/`: El almacenamiento público donde se guardan las cargas.
-
-### 3. Intrusión (Foothold)
-El panel de carga bloquea los archivos con extensión `.php`. Para evadir esta restricción basada en nombres de archivo (lista negra), se cambia la extensión del código malicioso a una extensión alternativa válida para el servidor de aplicaciones:
-```bash
-mv php-reverse-shell.php shell.phtml
-```
-Se sube el archivo con éxito, se activa un escucha local en nuestra máquina de ataque (`nc -lvnp 1234`) y se visita la ruta `http://<IP_DE_LA_MAQUINA>/uploads/shell.phtml` para disparar la ejecución del script.
-
-*   **Flag de Usuario:** Ubicada en `/var/www/user.txt` -> `THM{y0u_g0t_a_sh3ll_******}`
-
-### 4. Escalada de Privilegios (PrivEsc)
-Una vez dentro del sistema como el usuario web restringido (`www-data`), se buscan binarios del sistema que tengan configurado el bit **SUID** (permiten ejecutarse con los privilegios del creador del archivo, en este caso, root):
-```bash
-find / -perm -u=s -type f 2>/dev/null
-```
-El escaneo revela que **`/usr/bin/python`** posee el bit SUID activo. Utilizando una línea de comandos específica para romper entornos restringidos (técnica documentada en GTFOBins), se invoca una consola del sistema preservando los privilegios superiores:
-```bash
-/usr/bin/python -c 'import os; os.execl("/bin/sh", "sh", "-p")'
+nmap -p- -sV <IP_DE_LA_MAQUINA>
 ```
 
-*   **Flag de Root:** Ubicada en `/root/root.txt` -> `THM{pr1v1l3g3_3sc4l4t10n_******}`
+![Puertos y servicios detectados](evidencias/borradores/seleccion/01-recon-nmap.png)
 
----
+### 2. Enumeración web
 
-## 📝 Conclusiones y Remediación
-1.  **Filtros de Subida Débiles:** Las restricciones basadas únicamente en extensiones de archivos (listas negras) son ineficaces si no bloquean todas las variantes de ejecución de scripts web (como `.php5`, `.phtml`, `.phar`). Se debe implementar una lista blanca estricta y renombrar los archivos subidos de forma aleatoria.
-2.  **Permisos SUID Peligrosos:** Asignar atributos SUID a intérpretes interactivos de comandos enteros (`python`, `perl`, `bash`, `awk`) introduce un riesgo crítico inmediato que invalida la separación de privilegios del sistema operativo.
+Se enumeraron rutas del servidor web. `gobuster` encontró `/uploads/` y otras rutas estáticas; una segunda pasada con `dirb` permitió identificar `/panel/`, donde se encuentra el formulario de carga.
 
----
+```bash
+gobuster dir -u http://<IP_DE_LA_MAQUINA>/ \
+  -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt \
+  -x php,txt,html
 
-## ✒️ Autoría y Certificación
-*   **Auditor de Seguridad:** Patricio Allendes / PatoLock
-*   **Contacto / Portafolio:** https://github.com/patolock
-*   **Rol:** Estudiante de Ciberseguridad / Pentester Trainee
+dirb http://<IP_DE_LA_MAQUINA>/ /usr/share/dirb/wordlists/common.txt
+```
+
+![Rutas web encontradas](evidencias/borradores/seleccion/02-enumeracion-web.png)
+
+### 3. Acceso inicial
+
+Se preparó una reverse shell PHP para la dirección y el puerto de escucha de la máquina de laboratorio, se probó una extensión alternativa y se cargó el archivo desde `/panel/`. La interfaz confirmó la carga y el archivo quedó visible en `/uploads/`.
+
+Con el listener activo, se solicitó el archivo desde el navegador. La conexión entrante confirmó una shell como `www-data`.
+
+![Carga aceptada por el panel](evidencias/borradores/seleccion/03-carga-archivo.png)
+
+![Conexión recibida como www-data](evidencias/borradores/seleccion/04-shell-www-data.png)
+
+La flag de usuario se encontró en `/var/www/user.txt`. Se omite su valor para no publicar la flag.
+
+### 4. Escalada de privilegios
+
+Desde la shell se buscaron archivos con el bit SUID. En la salida apareció `/usr/bin/python2.7`. Se utilizó ese hallazgo dentro del laboratorio para obtener una shell con privilegios elevados; `whoami` confirmó el usuario `root`.
+
+![Binarios SUID encontrados](evidencias/borradores/seleccion/05-enumeracion-suid.png)
+
+![Verificación de acceso como root](evidencias/borradores/seleccion/06-root-verificado.png)
+
+La flag de root se encuentra en `/root/root.txt`. Su valor también se omite.
+
+## Lecciones y remediación
+
+- Validar las cargas en el servidor mediante una lista permitida, almacenar los archivos fuera del directorio ejecutable y evitar servirlos directamente desde una ruta pública.
+- No asignar SUID a intérpretes como Python. Revisar periódicamente los permisos especiales y retirarlos de los binarios que no los necesiten.
+- Mantener los servicios expuestos y sus componentes actualizados.
+
+## Nota sobre las evidencias
+
+Las imágenes se seleccionaron de `evidencias/borradores/kali/` y se guardaron en `evidencias/borradores/seleccion/`. Las capturas de carga y SUID están recortadas para enfocarlas y excluir la flag de usuario; las demás conservan el escritorio original. Antes de publicar, revisa y oculta las direcciones IP, nombres de usuario u otros datos personales que todavía sean visibles.
