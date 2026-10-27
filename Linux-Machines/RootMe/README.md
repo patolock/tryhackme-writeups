@@ -51,7 +51,7 @@ Con el listener activo, se solicitó el archivo desde el navegador. La conexión
 
 ![Conexión recibida como www-data](evidencias/04-shell-www-data.png)
 
-La flag de usuario se encontró en `/var/www/user.txt`. Se omite su valor para no publicar la flag.
+No se incluye una captura de la flag de usuario en la selección final.
 
 ### 4. Escalada de privilegios
 
@@ -61,7 +61,7 @@ Desde la shell se buscaron archivos con el bit SUID. En la salida apareció `/us
 
 ![Verificación de acceso como root](evidencias/06-root-verificado.png)
 
-La flag de root se encuentra en `/root/root.txt`. Su valor también se omite.
+La evidencia final confirma el acceso como `root`; no se incluye una captura de la flag de root.
 
 ## Lecciones y remediación
 
@@ -72,3 +72,12 @@ La flag de root se encuentra en `/root/root.txt`. Su valor también se omite.
 ## Nota sobre las evidencias
 
 Las evidencias finales se encuentran en `evidencias/`. Las capturas de carga y SUID están recortadas para enfocarlas y excluir la flag de usuario; las demás conservan el escritorio original. Antes de publicar, revisa y oculta las direcciones IP, nombres de usuario u otros datos personales que todavía sean visibles.
+
+---
+
+## ✍️ Autoría
+
+**Patricio Allendes** · [PatoLock](https://github.com/patolock)  
+*Estudiante de Ciberseguridad · Pentester Trainee*
+
+> *Documentar para aprender; aprender para proteger.*
