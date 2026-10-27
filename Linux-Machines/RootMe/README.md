@@ -25,7 +25,7 @@ Se escanearon los puertos de la máquina y se identificaron SSH en el puerto 22 
 nmap -p- -sV <IP_DE_LA_MAQUINA>
 ```
 
-![Puertos y servicios detectados](evidencias/borradores/seleccion/01-recon-nmap.png)
+![Puertos y servicios detectados](evidencias/01-recon-nmap.png)
 
 ### 2. Enumeración web
 
@@ -39,7 +39,7 @@ gobuster dir -u http://<IP_DE_LA_MAQUINA>/ \
 dirb http://<IP_DE_LA_MAQUINA>/ /usr/share/dirb/wordlists/common.txt
 ```
 
-![Rutas web encontradas](evidencias/borradores/seleccion/02-enumeracion-web.png)
+![Rutas web encontradas](evidencias/02-enumeracion-web.png)
 
 ### 3. Acceso inicial
 
@@ -47,9 +47,9 @@ Se preparó una reverse shell PHP para la dirección y el puerto de escucha de l
 
 Con el listener activo, se solicitó el archivo desde el navegador. La conexión entrante confirmó una shell como `www-data`.
 
-![Carga aceptada por el panel](evidencias/borradores/seleccion/03-carga-archivo.png)
+![Carga aceptada por el panel](evidencias/03-carga-archivo.png)
 
-![Conexión recibida como www-data](evidencias/borradores/seleccion/04-shell-www-data.png)
+![Conexión recibida como www-data](evidencias/04-shell-www-data.png)
 
 La flag de usuario se encontró en `/var/www/user.txt`. Se omite su valor para no publicar la flag.
 
@@ -57,9 +57,9 @@ La flag de usuario se encontró en `/var/www/user.txt`. Se omite su valor para n
 
 Desde la shell se buscaron archivos con el bit SUID. En la salida apareció `/usr/bin/python2.7`. Se utilizó ese hallazgo dentro del laboratorio para obtener una shell con privilegios elevados; `whoami` confirmó el usuario `root`.
 
-![Binarios SUID encontrados](evidencias/borradores/seleccion/05-enumeracion-suid.png)
+![Binarios SUID encontrados](evidencias/05-enumeracion-suid.png)
 
-![Verificación de acceso como root](evidencias/borradores/seleccion/06-root-verificado.png)
+![Verificación de acceso como root](evidencias/06-root-verificado.png)
 
 La flag de root se encuentra en `/root/root.txt`. Su valor también se omite.
 
@@ -71,4 +71,4 @@ La flag de root se encuentra en `/root/root.txt`. Su valor también se omite.
 
 ## Nota sobre las evidencias
 
-Las imágenes se seleccionaron de `evidencias/borradores/kali/` y se guardaron en `evidencias/borradores/seleccion/`. Las capturas de carga y SUID están recortadas para enfocarlas y excluir la flag de usuario; las demás conservan el escritorio original. Antes de publicar, revisa y oculta las direcciones IP, nombres de usuario u otros datos personales que todavía sean visibles.
+Las evidencias finales se encuentran en `evidencias/`. Las capturas de carga y SUID están recortadas para enfocarlas y excluir la flag de usuario; las demás conservan el escritorio original. Antes de publicar, revisa y oculta las direcciones IP, nombres de usuario u otros datos personales que todavía sean visibles.

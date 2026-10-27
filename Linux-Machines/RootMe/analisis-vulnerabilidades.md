@@ -13,7 +13,7 @@ Las puntuaciones son una **estimación técnica del escenario demostrado**, calc
 
 ## 2. Alcance, método y limitaciones
 
-- **Alcance:** máquina de laboratorio RootMe asignada por TryHackMe y evidencias guardadas en [`evidencias/borradores/seleccion/`](evidencias/borradores/seleccion/).
+- **Alcance:** máquina de laboratorio RootMe asignada por TryHackMe y evidencias finales guardadas en [`evidencias/`](evidencias/).
 - **Método:** observación del reconocimiento, prueba de carga y ejecución del archivo, recepción de una shell como `www-data`, enumeración de archivos SUID y verificación de identidad `root`.
 - **Criterio de severidad:** rangos cualitativos de CVSS v3.1: Crítica (9.0–10.0), Alta (7.0–8.9), Media (4.0–6.9), Baja (0.1–3.9) y Ninguna (0.0). La puntuación Base no sustituye un análisis de riesgo del entorno real.
 - **Limitación:** se analizaron las evidencias disponibles; no se realizó una auditoría independiente del código fuente, de la configuración completa del servidor ni de otros hosts.
@@ -31,8 +31,8 @@ Las puntuaciones son una **estimación técnica del escenario demostrado**, calc
 
 El panel acepta un archivo PHP y este queda publicado bajo `/uploads/`. Las capturas muestran la aceptación de la carga y, posteriormente, una conexión remota con una shell bajo el usuario `www-data`. Esto demuestra que el contenido cargado puede llegar a ser interpretado por el servidor, no solo almacenado.
 
-- [Confirmación de la carga](evidencias/borradores/seleccion/03-carga-archivo.png)
-- [Shell recibida como `www-data`](evidencias/borradores/seleccion/04-shell-www-data.png)
+- [Confirmación de la carga](evidencias/03-carga-archivo.png)
+- [Shell recibida como `www-data`](evidencias/04-shell-www-data.png)
 
 La superficie observada permite ejecución de código a través de HTTP sin que la evidencia muestre un requisito de autenticación o una acción adicional de otra víctima. Por ello, la estimación usa acceso de red, baja complejidad, sin privilegios previos y sin interacción de usuario. Los impactos de confidencialidad, integridad y disponibilidad se califican como altos para el servidor comprometido.
 
@@ -58,8 +58,8 @@ La guía de OWASP recomienda listas permitidas, validación del contenido y alma
 
 La enumeración de archivos con SUID incluye `/usr/bin/python2.7`. La evidencia posterior muestra la invocación del intérprete y confirma `root` mediante `whoami`.
 
-- [Enumeración SUID, con la flag excluida del recorte](evidencias/borradores/seleccion/05-enumeracion-suid.png)
-- [Verificación de identidad `root`](evidencias/borradores/seleccion/06-root-verificado.png)
+- [Enumeración SUID, con la flag excluida del recorte](evidencias/05-enumeracion-suid.png)
+- [Verificación de identidad `root`](evidencias/06-root-verificado.png)
 
 El vector requiere acceso local previo a una cuenta sin privilegios —en este caso, la shell obtenida como `www-data`—; una vez disponible, la escalada no requiere interacción de otra persona. El intérprete permite ejecutar operaciones arbitrarias, por lo que la configuración anula la separación de privilegios del sistema.
 
