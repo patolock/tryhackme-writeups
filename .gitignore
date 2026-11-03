@@ -225,7 +225,7 @@ notas-privadas.md
 *.pem
 
 # Capturas sin editar (si guardas una carpeta aparte de borradores)
-**/evidencias/borradores/
+**/borradores/
 
 # Archivos del sistema
 .DS_Store
